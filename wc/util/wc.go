@@ -1,10 +1,16 @@
 package util
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
-	"github.com/urfave/cli"
+	"log"
 	"os"
+
+	"github.com/urfave/cli"
+	"io/ioutil"
 )
+
 
 // Wc is the main function
 func Wc() *cli.App {
@@ -30,7 +36,58 @@ func Wc() *cli.App {
 		},
 	}
 	app.Action = func(c *cli.Context) error {
-		fmt.Println(os.Args)
+		
+		var buf bytes.Buffer
+		var clen int
+		var llen int
+		var mlen int
+		var wlen int
+		
+		reader := bufio.NewReader(os.Stdin)
+		text, err := reader.ReadString('\n')
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		buf.WriteString(text)
+
+		for i := range c.Args() {
+			fmt.Print(i)
+			content, err := ioutil.ReadFile(c.Args().Get(i))
+			if err != nil {
+				log.Fatal(err)
+			}
+		    buf.WriteString(string(content))
+		}
+
+
+		if c.Bool("c") {
+
+			clen = byteCounts(buf.String())
+
+		}
+
+		if c.Bool("l") {
+
+		}
+
+		if c.Bool("m") {
+
+			mlen = characterCounts(buf.String())
+
+			
+		}
+
+		if c.Bool("w") {
+			
+		}
+
+		if c.Bool("c") && c.Bool("m") {
+			mlen = 0
+		}
+		
+		fmt.Print(fmt.Sprintf("\t %d \t %d \t %d \t %d", clen, llen, mlen, wlen))
 		return nil
 	}
 	return app
