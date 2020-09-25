@@ -4,53 +4,49 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"log"
-	"os"
-
 	"github.com/urfave/cli"
 	"io/ioutil"
+	"log"
+	"os"
 )
 
-
-// Wc is the main function
+// Wc is the main function that triggers the counts
 func Wc() *cli.App {
 	app := cli.NewApp()
 	app.Name = "WC"
 	app.Usage = "The wc utility displays the number of lines, words, and bytes contained in each input file"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
-			Name: "c",
+			Name:  "c",
 			Usage: "The number of bytes in each input file is written to the standard output",
 		},
 		cli.BoolFlag{
-			Name: "l",
+			Name:  "l",
 			Usage: "The number of lines in each input file is written to the standard output",
 		},
 		cli.BoolFlag{
-			Name: "m",
+			Name:  "m",
 			Usage: "The number of characters in each input file is written to the standard output",
 		},
 		cli.BoolFlag{
-			Name: "w",
+			Name:  "w",
 			Usage: "The number of words in each input file is written to the standard output",
 		},
 	}
 	app.Action = func(c *cli.Context) error {
-		
-		var buf bytes.Buffer
-		var clen int
-		var llen int
-		var mlen int
-		var wlen int
-		
-		reader := bufio.NewReader(os.Stdin)
-		text, err := reader.ReadString('\n')
 
-		if err != nil {
-			log.Fatal(err)
+		var buf bytes.Buffer
+		var m map[string]int
+		m = make(map[string]int)
+
+		scanner := bufio.NewScanner(os.Stdin)
+		for scanner.Scan() {
+			buf.WriteString(scanner.Text())
 		}
 
-		buf.WriteString(text)
+		if err := scanner.Err(); err != nil {
+			log.Println(err)
+		}
 
 		for i := range c.Args() {
 			fmt.Print(i)
@@ -58,36 +54,36 @@ func Wc() *cli.App {
 			if err != nil {
 				log.Fatal(err)
 			}
-		    buf.WriteString(string(content))
+			buf.WriteString(string(content))
 		}
 
-
 		if c.Bool("c") {
-
-			clen = byteCounts(buf.String())
-
+			m["clen"] = byteCounts(buf.String())
 		}
 
 		if c.Bool("l") {
-
+			m["llen"] = lineCounts(buf.String())
 		}
 
 		if c.Bool("m") {
-
-			mlen = characterCounts(buf.String())
-
-			
+			m["mlen"] = characterCounts(buf.String())
 		}
 
 		if c.Bool("w") {
-			
+			m["wlen"] = wordCounts(buf.String())
 		}
 
 		if c.Bool("c") && c.Bool("m") {
-			mlen = 0
+			m["mlen"] = 0
 		}
+
+		for _, value := range m {
+			if value != 0 {
+				fmt.Print("\t", value)
+			}
+		}
+		fmt.Println("")
 		
-		fmt.Print(fmt.Sprintf("\t %d \t %d \t %d \t %d", clen, llen, mlen, wlen))
 		return nil
 	}
 	return app

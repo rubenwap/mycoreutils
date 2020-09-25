@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-func main () {
+func main() {
 	app := util.Wc()
 	app.Run(os.Args)
 }
