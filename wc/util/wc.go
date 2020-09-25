@@ -83,7 +83,7 @@ func Wc() *cli.App {
 			}
 		}
 		fmt.Println("")
-		
+
 		return nil
 	}
 	return app
