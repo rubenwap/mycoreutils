@@ -57,6 +57,7 @@ func Wc() *cli.App {
 			buf.WriteString(string(content))
 		}
 
+		
 		if c.Bool("c") {
 			m["clen"] = byteCounts(buf.String())
 		}
