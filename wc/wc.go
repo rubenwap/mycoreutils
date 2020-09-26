@@ -1,4 +1,4 @@
-package util
+package main
 
 import (
 	"bufio"
@@ -8,7 +8,26 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
+	"strings"
+	"unicode/utf8"
 )
+
+func byteCounts(text string) int {
+	return len(text)
+}
+
+func lineCounts(text string) int {
+	return len(strings.Split(text, "\n"))
+}
+
+func characterCounts(text string) int {
+	return utf8.RuneCountInString(text)
+}
+
+func wordCounts(text string) int {
+	return len(strings.Fields(text))
+}
+
 
 // Wc is the main function that triggers the counts
 func Wc() *cli.App {
@@ -57,7 +76,6 @@ func Wc() *cli.App {
 			buf.WriteString(string(content))
 		}
 
-		
 		if c.Bool("c") {
 			m["clen"] = byteCounts(buf.String())
 		}
@@ -88,4 +106,9 @@ func Wc() *cli.App {
 		return nil
 	}
 	return app
+}
+
+func main() {
+	app := Wc()
+	app.Run(os.Args)
 }
