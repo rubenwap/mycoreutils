@@ -4,13 +4,17 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
-	"github.com/urfave/cli"
 	"io/ioutil"
 	"log"
 	"os"
 	"strings"
+	"sync"
 	"unicode/utf8"
+
+	"github.com/urfave/cli"
 )
+
+var wg sync.WaitGroup
 
 func byteCounts(text string) int {
 	return len(text)
@@ -28,9 +32,7 @@ func wordCounts(text string) int {
 	return len(strings.Fields(text))
 }
 
-
-// Wc is the main function that triggers the counts
-func Wc() *cli.App {
+func wc() *cli.App {
 	app := cli.NewApp()
 	app.Name = "WC"
 	app.Usage = "The wc utility displays the number of lines, words, and bytes contained in each input file"
@@ -76,39 +78,62 @@ func Wc() *cli.App {
 			buf.WriteString(string(content))
 		}
 
-		if c.Bool("c") {
-			m["clen"] = byteCounts(buf.String())
+		bytesChan := make(chan int)
+		linesChan := make(chan int)
+		charactersChan := make(chan int)
+		wordChan := make(chan int)
+
+		wg.Add(4)
+		go func(text string) {
+			bytesChan <- byteCounts(text)
+			wg.Done()
+		}(buf.String())
+		go func(text string) {
+			linesChan <- lineCounts(text)
+			wg.Done()
+		}(buf.String())
+		go func(text string) {
+			charactersChan <- characterCounts(text)
+			wg.Done()
+		}(buf.String())
+		go func(text string) {
+			wordChan <- wordCounts(text)
+			wg.Done()
+		}(buf.String())
+
+		for i := 0; i < 4; i++ {
+			select {
+			case msg1 := <-bytesChan:
+				m["c"] = msg1
+			case msg2 := <-linesChan:
+				m["l"] = msg2
+			case msg3 := <-charactersChan:
+				m["m"] = msg3
+			case msg4 := <-wordChan:
+				m["w"] = msg4
+			}
 		}
 
-		if c.Bool("l") {
-			m["llen"] = lineCounts(buf.String())
-		}
-
-		if c.Bool("m") {
-			m["mlen"] = characterCounts(buf.String())
-		}
-
-		if c.Bool("w") {
-			m["wlen"] = wordCounts(buf.String())
-		}
+		wg.Wait()
 
 		if c.Bool("c") && c.Bool("m") {
 			m["mlen"] = 0
 		}
 
-		for _, value := range m {
-			if value != 0 {
-				fmt.Print("\t", value)
+		for key, value := range m {
+			if c.Bool(key) && value != 0 {
+				fmt.Print("\t", key, ": ", value)
 			}
 		}
 		fmt.Println("")
 
 		return nil
 	}
+
 	return app
 }
 
 func main() {
-	app := Wc()
+	app := wc()
 	app.Run(os.Args)
 }
