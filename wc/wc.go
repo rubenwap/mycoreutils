@@ -105,20 +105,18 @@ func wc() *cli.App {
 			select {
 			case msg1 := <-bytesChan:
 				m["c"] = msg1
+				m["m"] = 0
 			case msg2 := <-linesChan:
 				m["l"] = msg2
 			case msg3 := <-charactersChan:
 				m["m"] = msg3
+				m["c"] = 0
 			case msg4 := <-wordChan:
 				m["w"] = msg4
 			}
 		}
 
 		wg.Wait()
-
-		if c.Bool("c") && c.Bool("m") {
-			m["mlen"] = 0
-		}
 
 		for key, value := range m {
 			if c.Bool(key) && value != 0 {
