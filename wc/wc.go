@@ -34,7 +34,7 @@ func wordCounts(text string) int {
 
 func wc() *cli.App {
 	app := cli.NewApp()
-	app.Name = "WC"
+	app.Name = "wc"
 	app.Usage = "The wc utility displays the number of lines, words, and bytes contained in each input file"
 	app.Flags = []cli.Flag{
 		cli.BoolFlag{
