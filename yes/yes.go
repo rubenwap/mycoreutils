@@ -23,7 +23,9 @@ func yes() *cli.App {
 			go func() {
 				yesChan <- expletive
 			}()
-			fmt.Println(<-yesChan)
+			go func() {
+				fmt.Println(<-yesChan)
+			}()
 		}
 
 	}
