@@ -8,5 +8,6 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/urfave/cli v1.22.4
 	golang.org/x/arch v0.0.0-20200826200359-b19915210f00 // indirect
+	golang.org/x/sync v0.0.0-20201008141435-b3e1573b7520
 	golang.org/x/tour v0.0.0-20200508155540-0608babe047d
 )
