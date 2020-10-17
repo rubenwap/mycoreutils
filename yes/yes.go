@@ -6,10 +6,6 @@ import (
 	"os"
 )
 
-func sayYes(expletive string, ch chan string) {
-	ch <- expletive
-}
-
 func yes() *cli.App {
 	app := cli.NewApp()
 	app.Name = "yes"
@@ -25,7 +21,7 @@ func yes() *cli.App {
 
 		for {
 			go func() {
-				sayYes(expletive, yesChan)
+				yesChan <- expletive
 			}()
 			fmt.Println(<-yesChan)
 		}

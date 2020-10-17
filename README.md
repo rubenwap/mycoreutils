@@ -4,3 +4,4 @@ List of utilities (WIP):
 
 * wc
 * yes
+* whoami
