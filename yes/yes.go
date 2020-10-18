@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"github.com/urfave/cli"
 	"os"
+	"bufio"
 )
 
 func yes() *cli.App {
@@ -17,7 +18,8 @@ func yes() *cli.App {
 		}
 
 		for {
-			os.Stdout.Write(bytes.Repeat([]byte(expletive), 100000000))
+			f := bufio.NewWriterSize(os.Stdout, 8192)
+			f.Write(bytes.Repeat([]byte(expletive+"\n"), 100000000))
 		}
 	}
 	return app
