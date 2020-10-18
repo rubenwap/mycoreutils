@@ -6,8 +6,6 @@ import (
 	"os"
 )
 
-var b bytes.Buffer
-
 func yes() *cli.App {
 	app := cli.NewApp()
 	app.Name = "yes"
